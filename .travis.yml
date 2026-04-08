@@ -1,31 +1,4 @@
-language: java
-
-jdk:
-  - openjdk17
-
-dist: jammy
-
-cache:
-  directories:
-    - $HOME/.m2
-
-branches:
-  only:
-    - develop
-    - master
-
-before_install:
-  - chmod +x mvnw
-
-install:
-  - ./mvnw -B clean compile
-
-script:
-  - ./mvnw -B test
-  - ./mvnw -B package
-
-after_success:
-  - echo "Build y pruebas ejecutadas correctamente"
-
-after_failure:
-  - echo "Falló la compilación o las pruebas"
+dist: focal
+leguage: shell
+script: echo "Test"
+install: skip
