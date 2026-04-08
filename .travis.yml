@@ -1,7 +1,6 @@
 language: java
 jdk:
-  - openjdk11
-  - openjdk17
+  - openjdk21
 install:
   - mvn install -DskipTests=true -B -V
 script:
