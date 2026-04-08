@@ -1,7 +1,31 @@
 language: java
+
 jdk:
   - openjdk21
+
+dist: jammy
+
+cache:
+  directories:
+    - $HOME/.m2
+
+branches:
+  only:
+    - develop
+    - master
+
+before_install:
+  - chmod +x mvnw
+
 install:
-  - mvn install -DskipTests=true -B -V
+  - ./mvnw -B clean compile
+
 script:
-  - mvn test
+  - ./mvnw -B test
+  - ./mvnw -B package
+
+after_success:
+  - echo "Build y pruebas ejecutadas correctamente"
+
+after_failure:
+  - echo "Falló la compilación o las pruebas"
