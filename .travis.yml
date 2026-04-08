@@ -1,27 +1,7 @@
 language: java
-
 jdk:
   - openjdk21
-
-dist: jammy
-
-cache:
-  directories:
-    - $HOME/.m2
-
-branches:
-  only:
-    - develop
-    - master
-
 install:
-  - chmod +x mvnw
-  - ./mvnw -B -q clean install -DskipTests
-
+  - mvn install -DskipTests=true -B -V
 script:
-  - ./mvnw -B test
-
-notifications:
-  email:
-    on_success: change
-    on_failure: always
+  - mvn test
