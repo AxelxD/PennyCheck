@@ -158,8 +158,8 @@ cd pennycheck
 
 ```env
 APP_PORT=8080
-CDC_BASE_URL=https://api.circulocredito.com
-CDC_API_KEY=xxxxxx
+CDC_BASE_URL=https://services.circulodecredito.com.mx
+CDC_API_KEY=4wHrJrmH6iT4VQfKy3oy6GKKwYb7x1OZ
 WEBHOOK_TOKEN=secure_token
 LOG_LEVEL=INFO
 ```
@@ -287,13 +287,14 @@ Los sistemas internos pueden:
 ## Endpoint principal
 
 ```text
-POST /api/v1/pennycheck/validate
+POST /sandbox/v1/bavs/accountValidator
 ```
 
 ## Webhook
 
 ```text
 POST /api/v1/pennycheck/webhook
+GET  /sandbox/v1/bavs/accountValidator/{inquiryId}
 ```
 
 ---
@@ -344,11 +345,9 @@ Abrir Pull Request hacia:
 
 # Roadmap
 
-- [ ] Persistencia de correlación
-- [ ] Idempotencia avanzada del webhook
-- [ ] Docker
-- [ ] Docker Compose
-- [ ] GitHub Actions
+- [ ] Contrato con CDC
+- [ ] Registro en el API Manager de CDC
+- [ ] Registro de Webhook en el Webhook Manager de CDC
 - [ ] Cobertura de pruebas > 80%
 - [ ] OAuth2 / SSO
 - [ ] Panel de monitoreo

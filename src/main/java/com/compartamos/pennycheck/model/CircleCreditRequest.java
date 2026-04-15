@@ -1,9 +1,7 @@
 package com.compartamos.pennycheck.model;
 
+import com.compartamos.pennycheck.dto.AccountValidatorDto;
+
 public class CircleCreditRequest {
-    public String account_number;
-    public String bank_code;
-    public String account_type;
-    public String customer_id;
-    public String request_timestamp;
+    public AccountValidatorDto accountValidator;
 }
