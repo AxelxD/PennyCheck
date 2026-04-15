@@ -1,6 +1,6 @@
-package com.compartamos.pennycheck.model;
+package com.compartamos.pennycheck.dto;
 
-public class CircleCreditResponse {
+public class AckAccountValidatorResponse {
     public String acknowledgeId;
     public String dateTime;
     public String operation;
@@ -8,5 +8,4 @@ public class CircleCreditResponse {
     public String externalId;
     public String subscriptionId;
     public String inquiryId;
-    public Object result;
 }

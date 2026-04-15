@@ -1,48 +1,58 @@
 package com.compartamos.pennycheck.exception;
 
+import com.compartamos.pennycheck.dto.ErrorDetail;
+import com.compartamos.pennycheck.dto.ErrorsResponse;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Provider
 public class GlobalExceptionMapper implements ExceptionMapper<Exception> {
 
     @Override
     public Response toResponse(Exception exception) {
-        Map<String, Object> body = new HashMap<>();
-
         if (exception instanceof ConstraintViolationException validationException) {
-            body.put("code", "VALIDATION_ERROR");
-            body.put("message", validationException.getConstraintViolations()
+            String message = validationException.getConstraintViolations()
                     .stream()
                     .map(v -> v.getMessage())
-                    .collect(Collectors.joining(", ")));
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .type(MediaType.APPLICATION_JSON)
-                    .entity(body)
-                    .build();
+                    .sorted()
+                    .reduce((left, right) -> left + ", " + right)
+                    .orElse("Missign parameters {fields name}");
+            return buildError(Response.Status.BAD_REQUEST, "400", message);
+        }
+
+        if (exception instanceof BadRequestException) {
+            return buildError(Response.Status.BAD_REQUEST, "400", defaultMessage(exception, "Bad request."));
         }
 
         if (exception instanceof UnauthorizedWebhookException) {
-            body.put("code", "UNAUTHORIZED_WEBHOOK");
-            body.put("message", exception.getMessage());
-            return Response.status(Response.Status.UNAUTHORIZED)
-                    .type(MediaType.APPLICATION_JSON)
-                    .entity(body)
-                    .build();
+            return buildError(Response.Status.UNAUTHORIZED, "401.4", defaultMessage(exception, "Unauthorized."));
         }
 
-        body.put("code", "INTERNAL_ERROR");
-        body.put("message", exception.getMessage() == null ? "Error interno" : exception.getMessage());
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+        if (exception instanceof NotFoundException) {
+            return buildError(Response.Status.NOT_FOUND, "404.1", defaultMessage(exception, "Inquiry not found."));
+        }
+
+        return buildError(Response.Status.INTERNAL_SERVER_ERROR, "500", defaultMessage(exception, "There was an unexpected error, try again later."));
+    }
+
+    private Response buildError(Response.Status status, String code, String message) {
+        ErrorsResponse body = new ErrorsResponse(List.of(new ErrorDetail(code, message)));
+        return Response.status(status)
                 .type(MediaType.APPLICATION_JSON)
                 .entity(body)
                 .build();
+    }
+
+    private String defaultMessage(Exception exception, String fallback) {
+        return exception.getMessage() == null || exception.getMessage().isBlank()
+                ? fallback
+                : exception.getMessage();
     }
 }
