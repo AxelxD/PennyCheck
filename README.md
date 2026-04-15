@@ -1,160 +1,396 @@
+![Build](https://travis-ci.com/org/pennycheck.svg)
+![Java](https://img.shields.io/badge/Java-21-blue)
+![Quarkus](https://img.shields.io/badge/Quarkus-3.x-red)
+
 # PennyCheck
+## API de validación bancaria con Círculo de Crédito
 
-## Descripción general
+---
 
-**PennyCheck** es una API empresarial desarrollada en **Java 21 con Quarkus** para **Compartamos Servicios**, cuyo objetivo es integrar y desacoplar el consumo del servicio **Bank Account Verification** de **Círculo de Crédito**.
+# Resumen ejecutivo
 
-La solución permite recibir solicitudes internas con la nomenclatura y estructura de datos propias de Compartamos Servicios, transformarlas al formato requerido por el proveedor externo, consumir el servicio de validación bancaria y recibir posteriormente el resultado mediante un **webhook** seguro.
+**PennyCheck** es una API empresarial desarrollada en **Java 21 + Quarkus** para **Compartamos Servicios**, diseñada para desacoplar e integrar el consumo del servicio **Bank Account Verification** de **Círculo de Crédito**.
 
-## Problemática identificada
+Su propósito es permitir a los sistemas internos de Compartamos **validar cuentas bancarias antes de ejecutar operaciones financieras sensibles**, mediante una capa segura, trazable, escalable y mantenible.
 
-Durante el levantamiento inicial con personal de la empresa se detectó la necesidad de **validar cuentas bancarias antes de ejecutar operaciones financieras sensibles**.
+La solución recibe solicitudes internas, valida la información, transforma el modelo de datos institucional al formato requerido por el proveedor externo, consume el servicio y recibe resultados posteriores mediante un **webhook seguro**.
 
-Actualmente, Compartamos Servicios requiere consumir el servicio **Bank Account Verification** de Círculo de Crédito; sin embargo, existen diferencias importantes entre:
+---
 
-- La estructura de datos interna de la empresa
-- La nomenclatura de campos del proveedor externo
-- El flujo de respuesta, que puede devolverse posteriormente
-- Los lineamientos de seguridad y trazabilidad requeridos
+# Descripción
 
-La principal problemática consiste en que **no existe una capa intermedia especializada que traduzca, proteja y administre esta integración de forma controlada**.
+Este repositorio contiene la solución para el sistema **PennyCheck**.
 
-## Mitigación propuesta
+Su objetivo principal es permitir a los sistemas internos de **Compartamos Servicios** realizar el proceso de **validación bancaria previa a operaciones financieras** de forma eficiente, segura y escalable.
 
-La solución se aborda mediante el desarrollo de una API empresarial en **Java Quarkus** llamada **PennyCheck**, la cual:
+La arquitectura fue diseñada bajo principios de:
 
-1. Recibe solicitudes internas
-2. Valida los datos de entrada
-3. Transforma la información al formato de Círculo de Crédito
-4. Consume el servicio externo
-5. Expone un webhook para recibir la respuesta
-6. Homologa la respuesta al formato de Compartamos
-7. Aplica seguridad, trazabilidad y control de errores
+- Bajo acoplamiento
+- Seguridad por diseño
+- Trazabilidad
+- Integración desacoplada
+- Escalabilidad
+- Mantenibilidad
 
-## Arquitectura general
+---
+
+# Problema identificado
+
+Actualmente, Compartamos Servicios requiere consumir el servicio **Bank Account Verification** de Círculo de Crédito; sin embargo, esto presenta varios retos:
+
+- Diferencias entre la estructura interna y externa de datos
+- Nomenclatura distinta de campos
+- Flujo de respuesta asíncrono
+- Requerimientos estrictos de seguridad
+- Necesidad de trazabilidad de extremo a extremo
+
+Esto provoca:
+
+- Riesgo de errores de integración
+- Mayor complejidad técnica
+- Baja reutilización
+- Dificultad para mantenimiento
+- Menor control de auditoría
+
+---
+
+# Solución
+
+La solución propuesta consiste en una **API empresarial REST desarrollada en Quarkus**, que permite:
+
+- Automatizar la validación bancaria
+- Centralizar la integración con Círculo de Crédito
+- Homologar la información institucional
+- Mejorar seguridad y trazabilidad
+- Facilitar despliegues y mantenimiento
+- Preparar futuras extensiones funcionales
+
+---
+
+# Arquitectura
+
+La solución está compuesta por:
+
+- **Cliente consumidor:** Sistemas internos Compartamos
+- **Backend / API:** Java 21 + Quarkus
+- **Integración externa:** REST Client hacia Círculo de Crédito
+- **Webhook:** Callback seguro para recepción de resultados
+- **Infraestructura CI/CD:** GitHub + Travis CI
+- **Gestión del proyecto:** Trello / Zube
+- **Control de versiones:** Git Flow (`develop` / `master`)
+
+---
+
+# Diagrama de arquitectura
 
 ```mermaid
 flowchart LR
     A[Sistemas internos Compartamos] --> B[API PennyCheck]
-    B --> C[Validador y homologador]
-    C --> D[Servicio Bank Account Verification]
-    D --> E[Webhook PennyCheck]
-    E --> F[Procesamiento de resultado]
-    F --> G[Respuesta homologada]
-    B --> H[Logs y trazabilidad]
-    E --> H
+    B --> C[Validador]
+    B --> D[Homologador]
+    D --> E[REST Client - Círculo de Crédito]
+    E --> F[Bank Account Verification]
+    F --> G[Webhook PennyCheck]
+    G --> H[Procesador de respuesta]
     B --> I[Seguridad]
-    E --> I
+    B --> J[Logs y trazabilidad]
+    G --> J
+    K[GitHub] --> B
+    L[Trello / Zube] --> K
+    M[Travis CI] --> K
+```
 
-Componentes principales
-1. Sistemas internos Compartamos
-Componentes
-Consumidor interno
-Datos bancarios de entrada
-Identificador de correlación
-Requerimientos funcionales
-Enviar solicitud de validación
-Consultar o recibir resultado
-Requerimientos externos
-Consumo REST por HTTPS
-Formato JSON
-Requerimientos de diseño
-Contrato estable
-Bajo acoplamiento con proveedor
-Atributos
-Trazabilidad
-Consistencia
-Facilidad de integración
-2. API PennyCheck
-Componentes
-Endpoint principal
-Validador
-Transformador
-Cliente REST externo
-Webhook
-Logs
-Requerimientos funcionales
-Validar datos obligatorios
-Traducir payload
-Consumir servicio externo
-Procesar webhook
-Estandarizar respuesta
-Requerimientos de diseño
-Java 21
-Quarkus
-Arquitectura modular
-Configuración desacoplada
-Atributos
-Escalabilidad
-Mantenibilidad
-Disponibilidad
-3. Integración externa con Círculo de Crédito
-Componentes
-Endpoint externo
-Credenciales
-Contrato técnico
-Requerimientos
-Disponibilidad del servicio
-Seguridad en autenticación
-Manejo de errores y reintentos
-Atributos
-Confiabilidad
-Interoperabilidad
-4. Webhook
-Componentes
-Endpoint callback
-Procesador de respuesta
-Control idempotente
-Requerimientos
-Recepción segura
-Validación de origen
-Asociación con folio original
-Atributos
-Seguridad
-Auditabilidad
-5. Seguridad
-Componentes
-HTTPS
-Token o firma
-Control de acceso
-Logs de auditoría
-Requerimientos
-Protección de secretos
-Cifrado en tránsito
-Validación de autenticidad
-Protección del webhook
-Atributos
-Confidencialidad
-Integridad
-Disponibilidad
-Dependencia y prioridad por funcionalidad
-Elemento	Funcionalidad	Dependencia	Prioridad
-Sistemas internos	Envío de solicitud	Contrato de API	Alta
-API PennyCheck	Validación de datos	Reglas funcionales	Alta
-API PennyCheck	Homologación de campos	Contrato interno y externo	Alta
-API PennyCheck	Consumo de servicio externo	Credenciales proveedor	Alta
-API PennyCheck	Trazabilidad	ID correlación	Alta
-Webhook	Recepción de resultado	Callback del proveedor	Alta
-Webhook	Control de duplicados	Idempotencia	Media
-Seguridad	Protección HTTPS	Infraestructura	Alta
-Seguridad	Validación de autenticidad	Token/firma	Alta
-Seguridad	Auditoría	Logs	Media
-Alcance del producto
-Incluye
-Desarrollo de API PennyCheck
-Endpoint REST de entrada
-Validación y homologación de datos
-Integración con Bank Account Verification
-Webhook seguro
-Trazabilidad y logs
-Seguridad base
-No incluye
-Rediseño de sistemas consumidores
-Cambio del proveedor externo
-Portal administrativo adicional
-Nuevos procesos fuera de validación bancaria
-Conclusión
+---
 
-La solución PennyCheck, construida en Java con Quarkus, representa una propuesta técnicamente viable para desacoplar la complejidad de la integración con Círculo de Crédito, homologar la información institucional y garantizar la recepción segura de resultados mediante un webhook.
+# Tabla de contenidos
 
-El análisis realizado permite delimitar claramente el alcance del producto, establecer prioridades funcionales y sentar bases sólidas para las siguientes fases del proyecto, particularmente la planeación detallada, diseño técnico y desarrollo incremental del sistema.
+- [Resumen ejecutivo](#resumen-ejecutivo)
+- [Requerimientos](#requerimientos)
+- [Instalación](#instalación)
+- [Configuración](#configuración)
+- [Uso](#uso)
+- [Contribución](#contribución)
+- [Roadmap](#roadmap)
+- [Wiki del proyecto](#wiki-del-proyecto)
+
+---
+
+# Requerimientos
+
+## Infraestructura
+
+- **Servidor de aplicación:** Quarkus Embedded Server
+- **Servidor web:** No aplica (embebido en Quarkus)
+- **Base de datos:** No aplica en v1
+- **Sistema operativo recomendado:** Ubuntu / Windows / macOS
+
+## Software y dependencias
+
+- **Java:** 21
+- **Maven:** 3.9+
+- **Git:** 2.40+
+- **Travis CI:** Pipeline configurado
+- **Docker:** opcional en roadmap
+
+## Paquetes principales
+
+- Quarkus REST
+- Quarkus REST Client
+- Quarkus Jackson
+- Quarkus JUnit5
+- RESTEasy Reactive
+- SmallRye Config
+
+---
+
+# Instalación
+
+## Clonar repositorio
+
+```bash
+git clone https://github.com/tu-org/pennycheck.git
+cd pennycheck
+```
+
+---
+
+## Variables de entorno
+
+```env
+APP_PORT=8080
+CDC_BASE_URL=https://services.circulodecredito.com.mx
+CDC_API_KEY=4wHrJrmH6iT4VQfKy3oy6GKKwYb7x1OZ
+WEBHOOK_TOKEN=secure_token
+LOG_LEVEL=INFO
+```
+
+---
+
+## Instalar dependencias
+
+```bash
+./mvnw clean install
+```
+
+---
+
+## Ejecutar ambiente de desarrollo
+
+```bash
+./mvnw quarkus:dev
+```
+
+La API quedará disponible en:
+
+```text
+http://localhost:8080
+```
+
+---
+
+# Pruebas manuales
+
+## Flujo funcional
+
+1. Iniciar la aplicación
+2. Consumir endpoint principal
+3. Validar request
+4. Simular respuesta de proveedor
+5. Consumir webhook
+
+## Validar
+
+- Recepción de request
+- Validación de campos
+- Homologación correcta
+- Consumo externo
+- Recepción de callback
+- Logs de correlación
+- Seguridad básica
+
+---
+
+# Pruebas automatizadas
+
+```bash
+./mvnw test
+```
+
+---
+
+# Despliegue
+
+## Producción local
+
+```bash
+./mvnw clean package
+java -jar target/quarkus-app/quarkus-run.jar
+```
+
+---
+
+## Docker (roadmap)
+
+```bash
+docker build -t pennycheck .
+docker run -p 8080:8080 pennycheck
+```
+
+---
+
+# Configuración
+
+## Archivos principales
+
+```text
+src/main/resources/application.properties
+.travis.yml
+README.md
+```
+
+## Ejemplo
+
+```properties
+quarkus.http.port=8080
+quarkus.rest-client.cdc.url=${CDC_BASE_URL}
+quarkus.log.level=${LOG_LEVEL:INFO}
+```
+
+---
+
+# Validaciones previas
+
+Antes de ejecutar:
+
+- Java 21 instalado
+- Variables de entorno configuradas
+- Puerto 8080 disponible
+- Credenciales válidas de Círculo de Crédito
+- Wrapper Maven generado
+- Travis habilitado en el repositorio
+
+---
+
+# Uso
+
+## Referencia para usuario consumidor
+
+Los sistemas internos pueden:
+
+- Solicitar validación bancaria
+- Consultar respuesta técnica
+- Recibir resultado homologado
+- Consumir estatus del proceso
+
+---
+
+## Endpoint principal
+
+```text
+POST /sandbox/v1/bavs/accountValidator
+```
+
+## Webhook
+
+```text
+POST /api/v1/pennycheck/webhook
+GET  /sandbox/v1/bavs/accountValidator/{inquiryId}
+```
+
+---
+
+# Contribución
+
+## 1. Clonar repositorio
+
+```bash
+git clone https://github.com/tu-org/pennycheck.git
+cd pennycheck
+```
+
+## 2. Crear nueva rama
+
+```bash
+git checkout -b feature/nombre-cambio
+```
+
+## 3. Guardar cambios
+
+```bash
+git add .
+git commit -m "feat: descripción breve del cambio"
+```
+
+## 4. Subir rama
+
+```bash
+git push origin feature/nombre-cambio
+```
+
+## 5. Enviar Pull Request
+
+Abrir Pull Request hacia:
+
+- `develop` → cambios de desarrollo
+- `master` → liberación GA
+
+## 6. Esperar revisión y merge
+
+- Atender comentarios
+- Ajustar cambios
+- Validar Travis CI
+- Merge al aprobarse
+
+---
+
+# Roadmap
+
+- [ ] Contrato con CDC
+- [ ] Registro en el API Manager de CDC
+- [ ] Registro de Webhook en el Webhook Manager de CDC
+- [ ] Cobertura de pruebas > 80%
+- [ ] OAuth2 / SSO
+- [ ] Panel de monitoreo
+- [ ] Métricas Prometheus
+- [ ] Retry policy avanzada
+- [ ] Multiambiente DEV / QA / PROD
+- [ ] Alta disponibilidad
+
+---
+
+# Wiki del proyecto
+
+## Documentación técnica sugerida
+
+- Arquitectura detallada
+- Contrato request / response
+- Tabla de homologación de campos
+- Seguridad del webhook
+- Convención de ramas
+- Estrategia CI/CD
+- Manual de despliegue
+
+---
+
+# Estado del proyecto
+
+🚧 **Finalizado – Milestone QA**
+
+Ramas principales:
+
+- `develop`
+- `master`
+
+CI:
+
+- Travis CI habilitado
+
+Gestión:
+
+- Trello / Zube
+
+---
+
+# Licencia
+
+Uso académico y empresarial interno para **Compartamos Servicios** y **Tecmilenio**.
