@@ -1,4 +1,3 @@
-![Build](https://travis-ci.com/org/pennycheck.svg)
 ![Java](https://img.shields.io/badge/Java-21-blue)
 ![Quarkus](https://img.shields.io/badge/Quarkus-3.x-red)
 
@@ -254,6 +253,10 @@ README.md
 quarkus.http.port=8080
 quarkus.rest-client.cdc.url=${CDC_BASE_URL}
 quarkus.log.level=${LOG_LEVEL:INFO}
+```
+
+```payload
+"subscriptionId":48e202d5-9014-439a-8a90-fb7c6d2f0207
 ```
 
 ---
