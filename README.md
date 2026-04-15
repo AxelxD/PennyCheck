@@ -374,7 +374,7 @@ Abrir Pull Request hacia:
 
 # Estado del proyecto
 
-🚧 **En desarrollo – Milestone Beta**
+🚧 **Finalizado – Milestone QA**
 
 Ramas principales:
 
